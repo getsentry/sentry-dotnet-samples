@@ -4,7 +4,7 @@ To run this sample, edit [appsettings.json](appsettings.json) and **set your DSN
 Running the Demo
 1. Configure your DSN in [appsettings.json](appsettings.json)
 2. Configure your org slug and project slug in [deploy.ps1](deploy.ps1)
-3. Run `./deploy.ps1` from PowerShell.
+3. Run `./deploy.ps1` from PowerShell `pwsh`
 
 ![Alt Text](configure-launch-demo.gif)
 

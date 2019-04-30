@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sentry.Samples.AspNetCore.Mvc.Models;
-
+// POST http://localhost:62920/Home/PostIndex
+// POST http://localhost:62920/Home/PostIndexUnhandled
+// POST http://localhost:62920/Home/PostIndex
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
     public class HomeController : Controller
