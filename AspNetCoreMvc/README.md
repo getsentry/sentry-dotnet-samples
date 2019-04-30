@@ -20,3 +20,13 @@ Check [Program.cs](Program.cs) to see some Sentry customization done via the `We
 * Captures an unhandled exception coming from a view (See `About.cshtml` which throws an exception that goes through the `SpecialExceptionProcessor.cs`)
 * Including the request payload with the event (done via appsettings.json `IncludeRequestPayload`)
 * Sentry commits/releases integration using `sentry-cli` (done in deploy.ps1)
+
+
+
+# New
+1. `./deploy.ps1`
+2. `http://localhost:62920/Home/handled`
+or Postman
+```
+blah
+```

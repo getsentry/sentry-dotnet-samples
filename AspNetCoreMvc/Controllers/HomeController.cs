@@ -4,9 +4,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sentry.Samples.AspNetCore.Mvc.Models;
+// CURRENT
 // POST http://localhost:62920/Home/PostIndex
 // POST http://localhost:62920/Home/PostIndexUnhandled
 // POST http://localhost:62920/Home/PostIndex
+
+// GOAL simplified for thinkocapo/sentry-dotnet-samples and Back-End Demo Spec, eCommerce Checkout
+// GET  http://localhost:62920/Home/handled
+// GET  http://localhost:62920/Home/unhandled
+// POST http://localhost:62920/Home/PostIndex
+
+
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
     public class HomeController : Controller
@@ -25,6 +33,50 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         {
             return View();
         }
+         
+        // _logger.LogWarning("Param is null!", @params);
+        [HttpGet]
+        public async Task<String> handled([FromServices] IHub sentry)
+        {
+            try
+            {
+                // int n1 = 1;
+                // int n2 = 0;
+                // int ans = n1 / n2;
+                throw null; // System.NullReferenceException - Object reference not set to an instance of an object.
+            }
+            catch (Exception exception)
+            {
+                exception.Data.Add("detail",
+                    new
+                    {
+                        Reason = "There's a 'throw null' hard-coded in the try block"
+                    });
+
+                var id = sentry.CaptureException(exception); // ViewData["Message"] = "An exception was caught and sent to Sentry! Event id: " + id;
+            }
+            return "SUCCESS: back-end error handled gracefully";
+        }
+
+
+        [HttpGet]
+        public async Task<String> unhandled()
+        {
+            int n1 = 1;
+            int n2 = 0;
+            int ans = n1 / n2;
+            return "FAILURE: Server-side Error";
+        }
+
+
+        [HttpGet]
+        public async Task<String> checkout()
+        {
+            _logger.LogWarning("******* Checking out *******");
+            return "SUCCESS: checkout";
+        }
+
+
 
         // Example: An exception that goes unhandled by the app will be captured by Sentry:
         [HttpPost]
