@@ -7,6 +7,7 @@ using Sentry.Samples.AspNetCore.Mvc.Models;
 using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
+// using Newtonsoft.Json.Linq.JToken;
 using Sentry;
 using Microsoft.AspNetCore.Http.Internal; // for what ?
 
@@ -42,6 +43,14 @@ public struct Inventory
         hammer = h;
     }
 }
+public struct CartItem
+{
+    public string id;
+    public CartItem(string ID)
+    {
+        id = ID;
+    }
+}
 
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
@@ -51,24 +60,6 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         private readonly ILogger<HomeController> _logger;
 
         public Inventory inventory;
-
-        // would need work with Constructor
-        // public struct Inventory
-        // {
-        //     public string wrench, nails, hammer;
-        // }
-
-        // public Object Inventory = {
-        //     'wrench': 1,
-        //     'nails': 1,
-        //     'hammer': 1
-        // }
-        
-        // Inventory = {
-        //     'wrench': 1,
-        //     'nails': 1,
-        //     'hammer': 1
-        // }
 
         public HomeController(IGameService gameService, ILogger<HomeController> logger)
         {
@@ -100,6 +91,8 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                 reader.Close();
                 JObject order = JObject.Parse(body);
                 String cart = order["cart"].ToString();
+                JToken jCart = order["cart"];
+                // TODO 
 
                 // MIDDLEWARE - User, Tags (transaction_id, session_id), Headers
                 String email = order["email"].ToString();
@@ -125,9 +118,36 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                     scope.SetExtra("inventory", inventory);
                 });
                 
+
+                // "cart": [
+                //     { 
+                //         "id": "wrench"
+                //     }
+                // ],
                 // PROCESS ORDER
                 Inventory tempInventory = inventory;
-                // for (item in cart) {
+                // foreach (var item in cart) // WRONG, is for iterating the inventory struct and NOT the cart array
+                // _logger.LogInformation("\n LENGTH  " + jCart.Length);
+
+                // for (int i = 0; i < cart.Length; i += 1)
+                foreach (var item in order["cart"])
+                {
+                    _logger.LogInformation("ITEM1 " + item.ToString());
+                    _logger.LogInformation("ITEM2 " + item["id"]);
+
+                    // JObject item = JObject.Parse(order["cart"][i]);
+                    
+
+                    if (inventory[item["id"] <= 0)
+                    {
+                        // throw "Not enough inventory for " + item['id']
+                    }
+                    else
+                    {
+                        // tempInventory[item["id"]--
+                        // _logger.LogInformation('Success: ' + item['id'] + ' was purchased, remaining stock is ' + tempInventory[item['id']])
+                    }
+                }
                 // if Inventory <= 0
                 // throw new Error()
                 // else
