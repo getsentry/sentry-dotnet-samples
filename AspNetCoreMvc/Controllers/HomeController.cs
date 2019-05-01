@@ -4,11 +4,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sentry.Samples.AspNetCore.Mvc.Models;
-// StreamReader
 using System;
 using System.IO;
-// JObject deserialization
 using Newtonsoft.Json.Linq;
+
+// scope Email
+using Sentry;
+
 
 // CURRENT
 // POST http://localhost:62920/Home/PostIndex
@@ -21,7 +23,6 @@ using Newtonsoft.Json.Linq;
 // POST http://localhost:62920/Home/PostIndex
 
 using Microsoft.AspNetCore.Http.Internal;
-// using System.Web.Mvc;
 
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
@@ -41,11 +42,8 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         {
             return View();
         }
-         
-        // _logger.LogWarning("Param is null!", @params);
 
 
-        // INVENTORY
         [HttpPost]
         public async Task<String> checkout() //AuthorizationFilterContext context)
         {
@@ -54,31 +52,52 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
-                _logger.LogInformation(body);
                 reader.Close();
-                if (body != "")
-                {
-                    _logger.LogInformation("\nBODY IS HERE!!!!");
-                    JObject order = JObject.Parse(body);
-                    _logger.LogInformation("\n ORDER \n" + order);
-                    JToken jCart = order["cart"];
-                    JToken jEmail = order["email"];
-                    _logger.LogInformation("CART === " + jCart); // .toString()
-                    _logger.LogInformation("email === " + jEmail); // toString()
+                JObject order = JObject.Parse(body);
+                JToken jCart = order["cart"];
+                JToken jEmail = order["email"];
+                _logger.LogInformation("cart \n" + jCart); // .toString()
+                    
+                // MIDDLEWARE
+                // var body = reader.ReadToEnd();
+                // _logger.LogInformation(body);
+                // reader.Close();
+                // if (body != "") then set the email
+                _logger.LogInformation("email \n" + jEmail); // toString()
+                // TODO ****
+                // SentrySdk.ConfigureScope(scope =>
+                // {
+                //     scope.User = new User
+                //     {
+                //         Email = "john.doe@example.com"
+                //     };
+                // });
 
-                    // tempInventory = Inventory
-                    // for (item in order) {
-                        // if Inventory <= 0
-                            // throw new Error()
-                        // else
-                            // tempInventory[item]--
-                            // _logger.LogWarning("Success: " + item[id] + " was purchased. Remaining Stock: " + tempInventory[item[id])
-                    // }
-                }
-                else
-                {
-                    _logger.LogInformation("BODY IS MISSING!!!!");
-                }
+                // TODO headers
+                // SentrySdk.ConfigureScope(scope => 
+                // {
+                //     scope.SetTag("transaction_id", "1112223");
+                // });
+                // SentrySdk.ConfigureScope(scope => 
+                // {
+                //     scope.SetTag("session_id", "2223334");
+                // });
+                // // TODO global Inventory
+                // SentrySdk.ConfigureScope(scope => 
+                // {
+                //     scope.SetExtra("inventory", "{Inventory Object}");
+                // });
+
+                // TODO order vs jCart?
+                // tempInventory = Inventory
+                // for (item in order) {
+                    // if Inventory <= 0
+                        // throw new Error()
+                    // else
+                        // tempInventory[item]--
+                        // _logger.LogWarning("Success: " + item[id] + " was purchased. Remaining Stock: " + tempInventory[item[id])
+                // }
+
 
                 // if (order.GetType().GetProperty("cart") != null)
 
