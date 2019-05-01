@@ -7,12 +7,9 @@ using Sentry.Samples.AspNetCore.Mvc.Models;
 using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
-// using Newtonsoft.Json.Linq.JToken;
 using Sentry;
-using Microsoft.AspNetCore.Http.Internal; // for what ?
-
+using Microsoft.AspNetCore.Http.Internal;
 using Sentry.Samples.AspNetCore.Mvc;
-// using Sentry.Protocol.User;
 
 // CURRENT
 // POST http://localhost:62920/Home/PostIndex
@@ -24,48 +21,50 @@ using Sentry.Samples.AspNetCore.Mvc;
 // GET  http://localhost:62920/Home/unhandled
 // POST http://localhost:62920/Home/PostIndex
 
-
-
 public class User
 {
     public string Email { get; set; }
 }
 
-// struct, class, object?
-// NOTE - use dot notation like inventory.wrench to access attribute on instance of Inventory
-public struct Inventory
+public static class Store
 {
-    public string wrench, nails, hammer;
-    public Inventory(string w, string n, string h)
-    {
-        wrench = w;
-        nails = n;
-        hammer = h;
-    }
+    // *TODO make a JObject
+    public static string jsonInventory = @"{
+                wrench: '1',
+                nails: '1',
+                hammer: '1'
+                }";
 }
-public struct CartItem
-{
-    public string id;
-    public CartItem(string ID)
-    {
-        id = ID;
-    }
-}
+
+// TODO - MIDDLEWARE
+// var body = reader.ReadToEnd();
+// _logger.LogInformation(body);
+// reader.Close();
+// if (body != "") then set the email
+
+// GLOBAL VAR
+
+
+// SECOND NAMESPACE
+// Sentry.Samples.AspNetCore.Mvc.Globals
+// {
+
+// }                
 
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
-    public class HomeController : Controller //, IAuthorizationFilter
+    public class HomeController : Controller
     {
         private readonly IGameService _gameService;
         private readonly ILogger<HomeController> _logger;
 
-        public Inventory inventory;
+        // public string jsonInventory;
 
         public HomeController(IGameService gameService, ILogger<HomeController> logger)
         {
             _gameService = gameService;
             _logger = logger;
-            inventory = new Inventory("1", "1", "1");
+            _logger.LogInformation("\n\n ************ HOME CONTROLLER ************* \n");
         }
 
         [HttpGet]
@@ -74,17 +73,9 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
             return View();
         }
 
-
-        // TODO - MIDDLEWARE
-        // var body = reader.ReadToEnd();
-        // _logger.LogInformation(body);
-        // reader.Close();
-        // if (body != "") then set the email
-
         [HttpPost]
         public async Task<String> checkout() //AuthorizationFilterContext context) // ([FromBody] string text) ? 
         {
-
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
@@ -115,44 +106,30 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                 });
                 SentrySdk.ConfigureScope(scope => 
                 {
-                    scope.SetExtra("inventory", inventory);
+                    scope.SetExtra("inventory", Store.jsonInventory);
                 });
-                
-                // OLD INVENTORY
-                Inventory tempInventory = inventory;
 
-                // NEW INVENTORY
-                string json = @"{
-                wrench: '1',
-                nails: '1',
-                hammer: '1'
-                }";
-                JObject jObjectInventory = JObject.Parse(json);
+                // **TODO - ToString()
+                JObject jObjectInventory = JObject.Parse(Store.jsonInventory);
                 _logger.LogInformation("\n*********** BEFORE " + jObjectInventory.ToString());
 
 
                 JObject jObjectTempInventory = jObjectInventory;
                 foreach (var item in order["cart"])
                 {
-                    _logger.LogInformation("ITEM1 " + item.ToString());
-                    _logger.LogInformation("ITEM2 " + item["id"]); // logs "wrench", is not a string, must call ToString()
-
-                    // _logger.LogInformation("ITEM3 " + jObjectInventory[item["id"]].ToString());
-                    _logger.LogInformation("ITEM3 " + jObjectInventory[item["id"].ToString()].ToString()); 
-
                     if (Int32.Parse(jObjectInventory[item["id"].ToString()].ToString()) <= 0)
                     {
-                        _logger.LogInformation("Not enough inventory for " + item["id"].ToString()); // *throw
+                        _logger.LogInformation("\nNot enough inventory for " + item["id"].ToString());
+                        throw null; // todo ASPNET error throw
                     }
                     else
                     {
-                        // tempInventory[item["id"]./ToString()] -= 1; // OLD/FLASK
                         jObjectTempInventory["wrench"] = (Int32.Parse(jObjectTempInventory["wrench"].ToString()) - 1).ToString();
                     }
                 }
+                Store.jsonInventory = jObjectTempInventory.ToString();
 
-
-                _logger.LogInformation("\n*********** AFTER " + jObjectInventory.ToString());
+                _logger.LogInformation("\n*********** AFTER " + Store.jsonInventory.ToString());
                 return "SUCCESS: checkout";
             }
 
