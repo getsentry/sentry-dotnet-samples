@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sentry.Samples.AspNetCore.Mvc.Models;
+// StreamReader
+using System;
+using System.IO;
 // CURRENT
 // POST http://localhost:62920/Home/PostIndex
 // POST http://localhost:62920/Home/PostIndexUnhandled
@@ -14,10 +17,12 @@ using Sentry.Samples.AspNetCore.Mvc.Models;
 // GET  http://localhost:62920/Home/unhandled
 // POST http://localhost:62920/Home/PostIndex
 
+using Microsoft.AspNetCore.Http.Internal;
+// using System.Web.Mvc;
 
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : Controller //, IAuthorizationFilter
     {
         private readonly IGameService _gameService;
         private readonly ILogger<HomeController> _logger;
@@ -35,11 +40,47 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         }
          
         // _logger.LogWarning("Param is null!", @params);
+
+
+        // INVENTORY
+        [HttpPost]
+        public async Task<String> checkout() //AuthorizationFilterContext context)
+        {
+            _logger.LogWarning("******* Checking out *******");
+
+            // TODO the function body for process_order should not be inside the 'using' clause
+            using (var reader = new StreamReader(Request.Body))
+            {
+                var body = reader.ReadToEnd();
+                _logger.LogInformation(body);
+                reader.Close();
+
+                // if Request Body
+                    // order = json(requestBody), pass order to process_order function
+
+
+                // process_order
+                // tempInventory = Inventory
+                // for (item in order) {
+                    // if Inventory <= 0
+                        // throw new Error()
+                    // else
+                        // tempInventory[item]--
+                        // _logger.LogWarning("Success: " + item[id] + " was purchased. Remaining Stock: " + tempInventory[item[id])
+                // }
+                return "SUCCESS: checkout";
+            }
+
+            
+        }
+
+
         [HttpGet]
         public async Task<String> handled([FromServices] IHub sentry)
         {
             try
             {
+                // TODO - consider math exception as its a more readable error on Sentry ("Can't divide by 0" vs "NullExceptionValue")
                 // int n1 = 1;
                 // int n2 = 0;
                 // int ans = n1 / n2;
@@ -68,16 +109,7 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
             return "FAILURE: Server-side Error";
         }
 
-
-        [HttpGet]
-        public async Task<String> checkout()
-        {
-            _logger.LogWarning("******* Checking out *******");
-            return "SUCCESS: checkout";
-        }
-
-
-
+        
         // Example: An exception that goes unhandled by the app will be captured by Sentry:
         [HttpPost]
         public async Task PostIndex(string @params)
