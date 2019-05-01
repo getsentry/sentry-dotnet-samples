@@ -24,9 +24,28 @@ Check [Program.cs](Program.cs) to see some Sentry customization done via the `We
 
 
 # New
-1. `./deploy.ps1`
-2. `http://localhost:62920/Home/handled`
-or Postman
+1. `pwsh`
+2. `cd AspNetCoreMvc` 
+2. `./deploy.ps1`
+3. `http://localhost:62920/Home/handled`
+or
+4. Postman
 ```
-blah
+{ 
+	"cart": [
+		{ 
+			"id": "wrench"
+		}
+	],
+	"email": "mikejo@msn.com"
+}
 ```
+
+PR Notes...
+for json deserialization...
+Install-Package Newtonsoft.Json
+https://www.newtonsoft.com/json
+JsonConvert.DeserializeObject(order); ?
+
+// name = (string) jUser["name"];
+

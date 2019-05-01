@@ -7,6 +7,9 @@ using Sentry.Samples.AspNetCore.Mvc.Models;
 // StreamReader
 using System;
 using System.IO;
+// JObject deserialization
+using Newtonsoft.Json.Linq;
+
 // CURRENT
 // POST http://localhost:62920/Home/PostIndex
 // POST http://localhost:62920/Home/PostIndexUnhandled
@@ -46,7 +49,6 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         [HttpPost]
         public async Task<String> checkout() //AuthorizationFilterContext context)
         {
-            _logger.LogWarning("******* Checking out *******");
 
             // TODO the function body for process_order should not be inside the 'using' clause
             using (var reader = new StreamReader(Request.Body))
@@ -54,20 +56,32 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                 var body = reader.ReadToEnd();
                 _logger.LogInformation(body);
                 reader.Close();
+                if (body != "")
+                {
+                    _logger.LogInformation("\nBODY IS HERE!!!!");
+                    JObject order = JObject.Parse(body);
+                    _logger.LogInformation("\n ORDER \n" + order);
+                    JToken jCart = order["cart"];
+                    JToken jEmail = order["email"];
+                    _logger.LogInformation("CART === " + jCart); // .toString()
+                    _logger.LogInformation("email === " + jEmail); // toString()
 
-                // if Request Body
-                    // order = json(requestBody), pass order to process_order function
+                    // tempInventory = Inventory
+                    // for (item in order) {
+                        // if Inventory <= 0
+                            // throw new Error()
+                        // else
+                            // tempInventory[item]--
+                            // _logger.LogWarning("Success: " + item[id] + " was purchased. Remaining Stock: " + tempInventory[item[id])
+                    // }
+                }
+                else
+                {
+                    _logger.LogInformation("BODY IS MISSING!!!!");
+                }
 
+                // if (order.GetType().GetProperty("cart") != null)
 
-                // process_order
-                // tempInventory = Inventory
-                // for (item in order) {
-                    // if Inventory <= 0
-                        // throw new Error()
-                    // else
-                        // tempInventory[item]--
-                        // _logger.LogWarning("Success: " + item[id] + " was purchased. Remaining Stock: " + tempInventory[item[id])
-                // }
                 return "SUCCESS: checkout";
             }
 
