@@ -11,15 +11,7 @@ using Sentry;
 using Microsoft.AspNetCore.Http.Internal;
 using Sentry.Samples.AspNetCore.Mvc;
 
-// CURRENT
-// POST http://localhost:62920/Home/PostIndex
-// POST http://localhost:62920/Home/PostIndexUnhandled
-// POST http://localhost:62920/Home/PostIndex
 
-// GOAL simplified for thinkocapo/sentry-dotnet-samples and Back-End Demo Spec, eCommerce Checkout
-// GET  http://localhost:62920/Home/handled
-// GET  http://localhost:62920/Home/unhandled
-// POST http://localhost:62920/Home/PostIndex
 
 public class User
 {
@@ -40,16 +32,7 @@ public static class Store
 // var body = reader.ReadToEnd();
 // _logger.LogInformation(body);
 // reader.Close();
-// if (body != "") then set the email
-
-// GLOBAL VAR
-
-
-// SECOND NAMESPACE
-// Sentry.Samples.AspNetCore.Mvc.Globals
-// {
-
-// }                
+// if (body != "") then set the email       
 
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
@@ -57,9 +40,6 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
     {
         private readonly IGameService _gameService;
         private readonly ILogger<HomeController> _logger;
-
-        // public string jsonInventory;
-
         public HomeController(IGameService gameService, ILogger<HomeController> logger)
         {
             _gameService = gameService;
@@ -74,16 +54,14 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         }
 
         [HttpPost]
-        public async Task<String> checkout() //AuthorizationFilterContext context) // ([FromBody] string text) ? 
+        public async Task<String> checkout()
         {
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
                 reader.Close();
                 JObject order = JObject.Parse(body);
-                String cart = order["cart"].ToString();
-                JToken jCart = order["cart"];
-                // TODO 
+                JToken cart = order["cart"];
 
                 // MIDDLEWARE - User, Tags (transaction_id, session_id), Headers
                 String email = order["email"].ToString();
@@ -115,7 +93,7 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 
 
                 JObject jObjectTempInventory = jObjectInventory;
-                foreach (var item in order["cart"])
+                foreach (var item in cart)
                 {
                     if (Int32.Parse(jObjectInventory[item["id"].ToString()].ToString()) <= 0)
                     {

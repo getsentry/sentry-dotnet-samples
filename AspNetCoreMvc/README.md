@@ -63,3 +63,13 @@ JToken jEmail = order["email"];
 
 
 https://weblog.west-wind.com/posts/2013/dec/13/accepting-raw-request-body-content-with-aspnet-web-api
+
+
+// CURRENT
+// POST http://localhost:62920/Home/PostIndex
+// POST http://localhost:62920/Home/PostIndexUnhandled
+// POST http://localhost:62920/Home/PostIndex
+// GOAL simplified for thinkocapo/sentry-dotnet-samples and Back-End Demo Spec, eCommerce Checkout
+// GET  http://localhost:62920/Home/handled
+// GET  http://localhost:62920/Home/unhandled
+// POST http://localhost:62920/Home/PostIndex
