@@ -30,6 +30,19 @@ public class User
     public string Email { get; set; }
 }
 
+// struct, class, object?
+// NOTE - use dot notation like inventory.wrench to access attribute on instance of Inventory
+public struct Inventory
+{
+    public string wrench, nails, hammer;
+    public Inventory(string w, string n, string h)
+    {
+        wrench = w;
+        nails = n;
+        hammer = h;
+    }
+}
+
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
     public class HomeController : Controller //, IAuthorizationFilter
@@ -37,10 +50,31 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         private readonly IGameService _gameService;
         private readonly ILogger<HomeController> _logger;
 
+        public Inventory inventory;
+
+        // would need work with Constructor
+        // public struct Inventory
+        // {
+        //     public string wrench, nails, hammer;
+        // }
+
+        // public Object Inventory = {
+        //     'wrench': 1,
+        //     'nails': 1,
+        //     'hammer': 1
+        // }
+        
+        // Inventory = {
+        //     'wrench': 1,
+        //     'nails': 1,
+        //     'hammer': 1
+        // }
+
         public HomeController(IGameService gameService, ILogger<HomeController> logger)
         {
             _gameService = gameService;
             _logger = logger;
+            inventory = new Inventory("1", "1", "1");
         }
 
         [HttpGet]
@@ -86,23 +120,20 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                 {
                     scope.SetTag("session_id", session_id);
                 });
-
-                // TODO global Inventory
-                // SentrySdk.ConfigureScope(scope => 
-                // {
-                //     scope.SetExtra("inventory", "{Inventory Object}");
-                // });
-
-                // TODO order vs jCart?
-                // tempInventory = Inventory
-                // for (item in order) {
+                SentrySdk.ConfigureScope(scope => 
+                {
+                    scope.SetExtra("inventory", inventory);
+                });
+                
+                // PROCESS ORDER
+                Inventory tempInventory = inventory;
+                // for (item in cart) {
                 // if Inventory <= 0
                 // throw new Error()
                 // else
                 // tempInventory[item]--
                 // _logger.LogWarning("Success: " + item[id] + " was purchased. Remaining Stock: " + tempInventory[item[id])
                 // }
-
 
                 return "SUCCESS: checkout";
             }
