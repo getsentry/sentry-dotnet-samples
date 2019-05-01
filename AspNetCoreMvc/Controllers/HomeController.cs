@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Http.Internal;
 using Sentry.Samples.AspNetCore.Mvc;
 
 
-
 public class User
 {
     public string Email { get; set; }
@@ -21,11 +20,17 @@ public class User
 public static class Store
 {
     // *TODO make a JObject
-    public static string jsonInventory = @"{
-                wrench: '1',
-                nails: '1',
-                hammer: '1'
-                }";
+    // public static string inventory = @"{
+    //             wrench: '1',
+    //             nails: '1',
+    //             hammer: '1'
+    //             }";
+    public static JObject inventory = new JObject
+    {
+        { "wrench", 1 },
+        { "nails", 1 },
+        { "hammer", 1 }
+    };
 }
 
 // TODO - MIDDLEWARE
@@ -84,30 +89,27 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                 });
                 SentrySdk.ConfigureScope(scope => 
                 {
-                    scope.SetExtra("inventory", Store.jsonInventory);
+                    scope.SetExtra("inventory", Store.inventory);
                 });
 
-                // **TODO - ToString()
-                JObject jObjectInventory = JObject.Parse(Store.jsonInventory);
-                _logger.LogInformation("\n*********** BEFORE " + jObjectInventory.ToString());
+                _logger.LogInformation("\n*********** BEFORE " + Store.inventory.ToString());
 
-
-                JObject jObjectTempInventory = jObjectInventory;
+                JObject tempInventory = Store.inventory;
                 foreach (var item in cart)
                 {
-                    if (Int32.Parse(jObjectInventory[item["id"].ToString()].ToString()) <= 0)
+                    if (Int32.Parse(Store.inventory[item["id"].ToString()].ToString()) <= 0)
                     {
                         _logger.LogInformation("\nNot enough inventory for " + item["id"].ToString());
-                        throw null; // todo ASPNET error throw
+                        throw null;
                     }
                     else
                     {
-                        jObjectTempInventory["wrench"] = (Int32.Parse(jObjectTempInventory["wrench"].ToString()) - 1).ToString();
+                        tempInventory[item["id"].ToString()] = (Int32.Parse(tempInventory[item["id"].ToString()].ToString()) - 1).ToString();
                     }
                 }
-                Store.jsonInventory = jObjectTempInventory.ToString();
+                Store.inventory = tempInventory;
 
-                _logger.LogInformation("\n*********** AFTER " + Store.jsonInventory.ToString());
+                _logger.LogInformation("\n*********** AFTER " + Store.inventory.ToString());
                 return "SUCCESS: checkout";
             }
 
