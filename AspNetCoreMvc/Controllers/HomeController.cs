@@ -119,41 +119,39 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                 });
                 
 
-                // "cart": [
-                //     { 
-                //         "id": "wrench"
-                //     }
-                // ],
+                string json = @"{
+                wrench: '1',
+                nails: '1',
+                hammer: '1'
+                }";
+                JObject jObjectInventory = JObject.Parse(json);
+
                 // PROCESS ORDER
-                Inventory tempInventory = inventory;
-                // foreach (var item in cart) // WRONG, is for iterating the inventory struct and NOT the cart array
-                // _logger.LogInformation("\n LENGTH  " + jCart.Length);
+                Inventory tempInventory = inventory; // * jObjectInventory
 
                 // for (int i = 0; i < cart.Length; i += 1)
                 foreach (var item in order["cart"])
                 {
                     _logger.LogInformation("ITEM1 " + item.ToString());
-                    _logger.LogInformation("ITEM2 " + item["id"]);
+                    _logger.LogInformation("ITEM2 " + item["id"]); // logs "wrench", is not a string, must call ToString()
 
-                    // JObject item = JObject.Parse(order["cart"][i]);
-                    
+                    // dynamic dynamicItem = JObject.Parse(item.ToString());
+                    // dynamic dynamicInventory = JObject.Parse(inventory.ToString());
 
-                    if (inventory[item["id"] <= 0)
-                    {
-                        // throw "Not enough inventory for " + item['id']
-                    }
-                    else
-                    {
-                        // tempInventory[item["id"]--
-                        // _logger.LogInformation('Success: ' + item['id'] + ' was purchased, remaining stock is ' + tempInventory[item['id']])
-                    }
+                    // _logger.LogInformation("ITEM3 " + jObjectInventory[item["id"]].ToString());
+                    _logger.LogInformation("ITEM3 " + jObjectInventory[item["id"].ToString()].ToString()); 
+
+
+                    // if (jObjectInventory[item["id"]].ToString()] <= 0)
+                    // {
+                    //     // throw "Not enough inventory for " + item['id']
+                    // }
+                    // else
+                    // {
+                    //     // tempInventory[item["id"]]--
+                    //     // _logger.LogInformation('Success: ' + item['id'] + ' was purchased, remaining stock is ' + tempInventory[item['id']])
+                    // }
                 }
-                // if Inventory <= 0
-                // throw new Error()
-                // else
-                // tempInventory[item]--
-                // _logger.LogWarning("Success: " + item[id] + " was purchased. Remaining Stock: " + tempInventory[item[id])
-                // }
 
                 return "SUCCESS: checkout";
             }
