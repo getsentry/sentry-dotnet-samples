@@ -118,41 +118,41 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                     scope.SetExtra("inventory", inventory);
                 });
                 
+                // OLD INVENTORY
+                Inventory tempInventory = inventory;
 
+                // NEW INVENTORY
                 string json = @"{
                 wrench: '1',
                 nails: '1',
                 hammer: '1'
                 }";
                 JObject jObjectInventory = JObject.Parse(json);
+                _logger.LogInformation("\n*********** BEFORE " + jObjectInventory.ToString());
 
-                // PROCESS ORDER
-                Inventory tempInventory = inventory; // * jObjectInventory
 
-                // for (int i = 0; i < cart.Length; i += 1)
+                JObject jObjectTempInventory = jObjectInventory;
                 foreach (var item in order["cart"])
                 {
                     _logger.LogInformation("ITEM1 " + item.ToString());
                     _logger.LogInformation("ITEM2 " + item["id"]); // logs "wrench", is not a string, must call ToString()
 
-                    // dynamic dynamicItem = JObject.Parse(item.ToString());
-                    // dynamic dynamicInventory = JObject.Parse(inventory.ToString());
-
                     // _logger.LogInformation("ITEM3 " + jObjectInventory[item["id"]].ToString());
                     _logger.LogInformation("ITEM3 " + jObjectInventory[item["id"].ToString()].ToString()); 
 
-
-                    // if (jObjectInventory[item["id"]].ToString()] <= 0)
-                    // {
-                    //     // throw "Not enough inventory for " + item['id']
-                    // }
-                    // else
-                    // {
-                    //     // tempInventory[item["id"]]--
-                    //     // _logger.LogInformation('Success: ' + item['id'] + ' was purchased, remaining stock is ' + tempInventory[item['id']])
-                    // }
+                    if (Int32.Parse(jObjectInventory[item["id"].ToString()].ToString()) <= 0)
+                    {
+                        _logger.LogInformation("Not enough inventory for " + item["id"].ToString()); // *throw
+                    }
+                    else
+                    {
+                        // tempInventory[item["id"]./ToString()] -= 1; // OLD/FLASK
+                        jObjectTempInventory["wrench"] = (Int32.Parse(jObjectTempInventory["wrench"].ToString()) - 1).ToString();
+                    }
                 }
 
+
+                _logger.LogInformation("\n*********** AFTER " + jObjectInventory.ToString());
                 return "SUCCESS: checkout";
             }
 
