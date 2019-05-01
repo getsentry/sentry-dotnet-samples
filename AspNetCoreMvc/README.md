@@ -49,3 +49,17 @@ JsonConvert.DeserializeObject(order); ?
 
 // name = (string) jUser["name"];
 
+// if (order.GetType().GetProperty("cart") != null)
+
+
+
+var User = new { email = email };
+// scope.User = new { email = email }; // FAILS
+// scope.User = User; // FAILS
+
+
+JToken jCart = order["cart"];
+JToken jEmail = order["email"];
+
+
+https://weblog.west-wind.com/posts/2013/dec/13/accepting-raw-request-body-content-with-aspnet-web-api

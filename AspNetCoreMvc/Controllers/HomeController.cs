@@ -7,10 +7,11 @@ using Sentry.Samples.AspNetCore.Mvc.Models;
 using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
-
-// scope Email
 using Sentry;
+using Microsoft.AspNetCore.Http.Internal; // for what ?
 
+using Sentry.Samples.AspNetCore.Mvc;
+// using Sentry.Protocol.User;
 
 // CURRENT
 // POST http://localhost:62920/Home/PostIndex
@@ -22,7 +23,12 @@ using Sentry;
 // GET  http://localhost:62920/Home/unhandled
 // POST http://localhost:62920/Home/PostIndex
 
-using Microsoft.AspNetCore.Http.Internal;
+
+
+public class User
+{
+    public string Email { get; set; }
+}
 
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
@@ -44,45 +50,44 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         }
 
 
+        // TODO - MIDDLEWARE
+        // var body = reader.ReadToEnd();
+        // _logger.LogInformation(body);
+        // reader.Close();
+        // if (body != "") then set the email
+
         [HttpPost]
-        public async Task<String> checkout() //AuthorizationFilterContext context)
+        public async Task<String> checkout() //AuthorizationFilterContext context) // ([FromBody] string text) ? 
         {
 
-            // TODO the function body for process_order should not be inside the 'using' clause
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
                 reader.Close();
                 JObject order = JObject.Parse(body);
-                JToken jCart = order["cart"];
-                JToken jEmail = order["email"];
-                _logger.LogInformation("cart \n" + jCart); // .toString()
-                    
-                // MIDDLEWARE
-                // var body = reader.ReadToEnd();
-                // _logger.LogInformation(body);
-                // reader.Close();
-                // if (body != "") then set the email
-                _logger.LogInformation("email \n" + jEmail); // toString()
-                // TODO ****
-                // SentrySdk.ConfigureScope(scope =>
-                // {
-                //     scope.User = new User
-                //     {
-                //         Email = "john.doe@example.com"
-                //     };
-                // });
+                String cart = order["cart"].ToString();
 
-                // TODO headers
-                // SentrySdk.ConfigureScope(scope => 
-                // {
-                //     scope.SetTag("transaction_id", "1112223");
-                // });
-                // SentrySdk.ConfigureScope(scope => 
-                // {
-                //     scope.SetTag("session_id", "2223334");
-                // });
-                // // TODO global Inventory
+                // MIDDLEWARE - User, Tags (transaction_id, session_id), Headers
+                String email = order["email"].ToString();
+                String transaction_id = Request.Headers["X-transaction-ID"];
+                String session_id = Request.Headers["X-session-ID"];
+                SentrySdk.ConfigureScope(scope =>
+                {
+                    scope.User = new Sentry.Protocol.User
+                    {
+                        Email = email
+                    };
+                });
+                SentrySdk.ConfigureScope(scope =>
+                {
+                    scope.SetTag("transaction_id", transaction_id);
+                });
+                SentrySdk.ConfigureScope(scope =>
+                {
+                    scope.SetTag("session_id", session_id);
+                });
+
+                // TODO global Inventory
                 // SentrySdk.ConfigureScope(scope => 
                 // {
                 //     scope.SetExtra("inventory", "{Inventory Object}");
@@ -91,20 +96,18 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                 // TODO order vs jCart?
                 // tempInventory = Inventory
                 // for (item in order) {
-                    // if Inventory <= 0
-                        // throw new Error()
-                    // else
-                        // tempInventory[item]--
-                        // _logger.LogWarning("Success: " + item[id] + " was purchased. Remaining Stock: " + tempInventory[item[id])
+                // if Inventory <= 0
+                // throw new Error()
+                // else
+                // tempInventory[item]--
+                // _logger.LogWarning("Success: " + item[id] + " was purchased. Remaining Stock: " + tempInventory[item[id])
                 // }
 
-
-                // if (order.GetType().GetProperty("cart") != null)
 
                 return "SUCCESS: checkout";
             }
 
-            
+
         }
 
 
@@ -142,7 +145,7 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
             return "FAILURE: Server-side Error";
         }
 
-        
+
         // Example: An exception that goes unhandled by the app will be captured by Sentry:
         [HttpPost]
         public async Task PostIndex(string @params)
