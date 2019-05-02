@@ -41,30 +41,8 @@ or
 }
 ```
 
-PR Notes...
-for json deserialization...
-Install-Package Newtonsoft.Json
-https://www.newtonsoft.com/json
-JsonConvert.DeserializeObject(order); ?
 
-// name = (string) jUser["name"];
-
-// if (order.GetType().GetProperty("cart") != null)
-
-
-
-var User = new { email = email };
-// scope.User = new { email = email }; // FAILS
-// scope.User = User; // FAILS
-
-
-JToken jCart = order["cart"];
-JToken jEmail = order["email"];
-
-
-https://weblog.west-wind.com/posts/2013/dec/13/accepting-raw-request-body-content-with-aspnet-web-api
-
-
+////////////////////////////////////////////////////////////////////
 // CURRENT
 // POST http://localhost:62920/Home/PostIndex
 // POST http://localhost:62920/Home/PostIndexUnhandled
@@ -88,3 +66,9 @@ https://weblog.west-wind.com/posts/2013/dec/13/accepting-raw-request-body-conten
     //             nails: '1',
     //             hammer: '1'
     //             }";
+
+
+TODO - get; set; not working
+
+// TODO - consider math exception as its a more readable error on Sentry ("Can't divide by 0" vs "NullExceptionValue")
+			// int n1 = 1;
