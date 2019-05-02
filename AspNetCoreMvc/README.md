@@ -29,7 +29,7 @@ Check [Program.cs](Program.cs) to see some Sentry customization done via the `We
 2. `./deploy.ps1`
 3. `http://localhost:62920/Home/handled`
 or
-4. Postman
+4. Postman `localhost:62920/Home/checkout`
 ```
 { 
 	"cart": [

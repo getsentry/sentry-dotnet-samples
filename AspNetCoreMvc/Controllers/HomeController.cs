@@ -49,7 +49,6 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         {
             _gameService = gameService;
             _logger = logger;
-            _logger.LogInformation("\n\n ************ HOME CONTROLLER ************* \n");
         }
 
         [HttpGet]
@@ -100,7 +99,7 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                     if (Int32.Parse(Store.inventory[item["id"].ToString()].ToString()) <= 0)
                     {
                         _logger.LogInformation("\nNot enough inventory for " + item["id"].ToString());
-                        throw null;
+                        throw new Exception("Not enough inventory for " + item["id"].ToString());
                     }
                     else
                     {
