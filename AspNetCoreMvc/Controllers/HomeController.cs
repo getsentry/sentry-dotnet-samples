@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.Collections; 
+using System.Collections.Generic; 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,15 +18,8 @@ public class User
 {
     public string Email { get; set; }
 }
-
 public static class Store
 {
-    // *TODO make a JObject
-    // public static string inventory = @"{
-    //             wrench: '1',
-    //             nails: '1',
-    //             hammer: '1'
-    //             }";
     public static JObject inventory = new JObject
     {
         { "wrench", 1 },
@@ -32,12 +27,46 @@ public static class Store
         { "hammer", 1 }
     };
 }
+public class Item
+{
+    public string id;
+    public Item(JToken item)
+    {
+        id = item["id"].ToString();
+    }
+    public string getId()
+    {
+        return id;
+    }
+}
+public class Order
+{
+    public List<Item> cart;
+    public string email;
+    public Order(string body)
+    {
+        JObject order = JObject.Parse(body);
+        email = order["email"].ToString();
+        cart = new List<Item> {};
+        foreach (var item in order["cart"])
+        {
+            Item cartItem = new Item(item);
+            cart.Add(cartItem);
+        };
+    }
 
-// TODO - MIDDLEWARE
-// var body = reader.ReadToEnd();
-// _logger.LogInformation(body);
-// reader.Close();
-// if (body != "") then set the email       
+    public List<Item> getCart()
+    {
+        return cart;
+    }
+
+    public string getEmail()
+    {
+        return email;
+    }
+}
+
+   
 
 namespace Sentry.Samples.AspNetCore.Mvc.Controllers
 {
@@ -64,11 +93,18 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
             {
                 var body = reader.ReadToEnd();
                 reader.Close();
-                JObject order = JObject.Parse(body);
-                JToken cart = order["cart"];
+                // OLD
+                // JObject order = JObject.Parse(body);
+                // JToken cart = order["cart"];
+
+                // NEW
+                Order order = new Order(body);
+                List<Item> cart = order.getCart();
+                // _logger.LogInformation("\nXXXXXXXXX LENGTH " + cart.);
+
 
                 // MIDDLEWARE - User, Tags (transaction_id, session_id), Headers
-                String email = order["email"].ToString();
+                String email = order.getEmail(); //["email"].ToString();
                 String transaction_id = Request.Headers["X-transaction-ID"];
                 String session_id = Request.Headers["X-session-ID"];
                 SentrySdk.ConfigureScope(scope =>
@@ -94,16 +130,15 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                 _logger.LogInformation("\n*********** BEFORE " + Store.inventory.ToString());
 
                 JObject tempInventory = Store.inventory;
-                foreach (var item in cart)
+                foreach (Item item in cart)
                 {
-                    if (Int32.Parse(Store.inventory[item["id"].ToString()].ToString()) <= 0)
+                    if (Store.inventory[item.getId()].ToObject<int>() <= 0)
                     {
-                        _logger.LogInformation("\nNot enough inventory for " + item["id"].ToString());
-                        throw new Exception("Not enough inventory for " + item["id"].ToString());
+                        throw new Exception("Not enough inventory for " + item.getId());
                     }
                     else
                     {
-                        tempInventory[item["id"].ToString()] = (Int32.Parse(tempInventory[item["id"].ToString()].ToString()) - 1).ToString();
+                        tempInventory[item.getId()] = tempInventory[item.getId()].ToObject<int>() - 1;
                     }
                 }
                 Store.inventory = tempInventory;

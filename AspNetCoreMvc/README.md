@@ -73,3 +73,18 @@ https://weblog.west-wind.com/posts/2013/dec/13/accepting-raw-request-body-conten
 // GET  http://localhost:62920/Home/handled
 // GET  http://localhost:62920/Home/unhandled
 // POST http://localhost:62920/Home/PostIndex
+
+
+// TODO - MIDDLEWARE
+// var body = reader.ReadToEnd();
+// _logger.LogInformation(body);
+// reader.Close();
+// if (body != "") then set the email
+
+
+// *TODO make a JObject
+    // public static string inventory = @"{
+    //             wrench: '1',
+    //             nails: '1',
+    //             hammer: '1'
+    //             }";
