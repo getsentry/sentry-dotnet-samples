@@ -94,6 +94,25 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
             return View();
         }
 
+        public void process_order(List<Item> cart)
+        {
+            _logger.LogInformation("\n*********** BEFORE " + Store.inventory);
+            Dictionary<string, int> tempInventory = Store.inventory;
+            foreach (Item item in cart)
+            {
+                if (Store.inventory[item.getId()] <= 0)
+                {
+                    throw new Exception("Not enough inventory for " + item.getId());
+                }
+                else
+                {
+                    tempInventory[item.getId()] = tempInventory[item.getId()] - 1;
+                }
+            }
+            Store.inventory = tempInventory;
+            _logger.LogInformation("\n*********** AFTER " + Store.inventory);
+        }
+
         [HttpPost]
         // public async Task<String> checkout([FromBody] Order order)
         public async Task<String> checkout()
@@ -104,8 +123,8 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                 reader.Close();
 
                 Order order = new Order(body);
-                List<Item> cart = order.getCart();
 
+                // Set Sentry Context (User, Tags, Extra)
                 String email = order.getEmail();
                 String transaction_id = Request.Headers["X-transaction-ID"];
                 String session_id = Request.Headers["X-session-ID"];
@@ -129,23 +148,10 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                     scope.SetExtra("inventory", Store.inventory);
                 });
 
-                _logger.LogInformation("\n*********** BEFORE " + Store.inventory);
+                // Process the Order (i.e. checkout)
+                List<Item> cart = order.getCart();
+                process_order(cart);
 
-                Dictionary<string, int> tempInventory = Store.inventory;
-                foreach (Item item in cart)
-                {
-                    if (Store.inventory[item.getId()] <= 0)
-                    {
-                        throw new Exception("Not enough inventory for " + item.getId());
-                    }
-                    else
-                    {
-                        tempInventory[item.getId()] = tempInventory[item.getId()] - 1;
-                    }
-                }
-                Store.inventory = tempInventory;
-
-                _logger.LogInformation("\n*********** AFTER " + Store.inventory);
                 return "SUCCESS: checkout";
             }
         }
