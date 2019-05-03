@@ -41,34 +41,14 @@ or
 }
 ```
 
-
-////////////////////////////////////////////////////////////////////
-// CURRENT
-// POST http://localhost:62920/Home/PostIndex
-// POST http://localhost:62920/Home/PostIndexUnhandled
-// POST http://localhost:62920/Home/PostIndex
-// GOAL simplified for thinkocapo/sentry-dotnet-samples and Back-End Demo Spec, eCommerce Checkout
-// GET  http://localhost:62920/Home/handled
-// GET  http://localhost:62920/Home/unhandled
-// POST http://localhost:62920/Home/PostIndex
-
-
-// TODO - MIDDLEWARE
+### Q's to Answer
+// MIDDLEWARE
 // var body = reader.ReadToEnd();
 // _logger.LogInformation(body);
 // reader.Close();
 // if (body != "") then set the email
 
+// - get; set; not working
 
-// *TODO make a JObject
-    // public static string inventory = @"{
-    //             wrench: '1',
-    //             nails: '1',
-    //             hammer: '1'
-    //             }";
-
-
-TODO - get; set; not working
-
-// TODO - consider math exception as its a more readable error on Sentry ("Can't divide by 0" vs "NullExceptionValue")
-			// int n1 = 1;
+//  consider math exception as its a more readable error on Sentry ("Can't divide by 0" vs "NullExceptionValue")
+			// int n1 = 1; // or a different exception type (see deprecated code or online examples)

@@ -20,12 +20,6 @@ public class User
 }
 public static class Store
 {
-    // public static JObject inventory = new JObject
-    // {
-    //     { "wrench", 1 },
-    //     { "nails", 1 },
-    //     { "hammer", 1 }
-    // };
     public static Dictionary<string, int> inventory 
         = new Dictionary<string, int>
     {
@@ -86,12 +80,6 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         {
             _gameService = gameService;
             _logger = logger;
-        }
-
-        [HttpGet]
-        public IActionResult Index()
-        {
-            return View();
         }
 
         public void process_order(List<Item> cart)
@@ -162,11 +150,7 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
         {
             try
             {
-                // TODO - consider math exception as its a more readable error on Sentry ("Can't divide by 0" vs "NullExceptionValue")
-                // int n1 = 1;
-                // int n2 = 0;
-                // int ans = n1 / n2;
-                throw null; // System.NullReferenceException - Object reference not set to an instance of an object.
+                throw null;
             }
             catch (Exception exception)
             {
