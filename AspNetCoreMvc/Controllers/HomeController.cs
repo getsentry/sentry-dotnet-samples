@@ -20,12 +20,20 @@ public class User
 }
 public static class Store
 {
-    public static JObject inventory = new JObject
+    // public static JObject inventory = new JObject
+    // {
+    //     { "wrench", 1 },
+    //     { "nails", 1 },
+    //     { "hammer", 1 }
+    // };
+    public static Dictionary<string, int> inventory 
+        = new Dictionary<string, int>
     {
         { "wrench", 1 },
         { "nails", 1 },
         { "hammer", 1 }
     };
+    
 }
 public class Item
 {
@@ -121,23 +129,23 @@ namespace Sentry.Samples.AspNetCore.Mvc.Controllers
                     scope.SetExtra("inventory", Store.inventory);
                 });
 
-                _logger.LogInformation("\n*********** BEFORE " + Store.inventory.ToString());
+                _logger.LogInformation("\n*********** BEFORE " + Store.inventory);
 
-                JObject tempInventory = Store.inventory;
+                Dictionary<string, int> tempInventory = Store.inventory;
                 foreach (Item item in cart)
                 {
-                    if (Store.inventory[item.getId()].ToObject<int>() <= 0)
+                    if (Store.inventory[item.getId()] <= 0)
                     {
                         throw new Exception("Not enough inventory for " + item.getId());
                     }
                     else
                     {
-                        tempInventory[item.getId()] = tempInventory[item.getId()].ToObject<int>() - 1;
+                        tempInventory[item.getId()] = tempInventory[item.getId()] - 1;
                     }
                 }
                 Store.inventory = tempInventory;
 
-                _logger.LogInformation("\n*********** AFTER " + Store.inventory.ToString());
+                _logger.LogInformation("\n*********** AFTER " + Store.inventory);
                 return "SUCCESS: checkout";
             }
         }
